@@ -12,3 +12,23 @@ span.youtube-preview {
 span.youtube-preview:hover {
     color: #3B3B3B;
 }
+div.yt-thumb.video-thumb {
+    background: #9AF1E2 !important;
+}
+
+#youtube-preview-ext {
+    z-index:9000000000;
+    position: fixed;
+    /* top:30%;
+    left:35%; */
+    right: 10px;
+    bottom: 10px;
+}
+
+span.spf-link.ux-thumb-wrap.contains-addto {
+    background: #9AF1E2 !important;
+}
+
+span.video-thumb.yt-thumb.yt-thumb-170.yt-thumb-fluid {
+    background: #9AF1E2 !important;
+}
