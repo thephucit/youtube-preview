@@ -25,9 +25,5 @@
             "js/background.js"
         ]
     },
-    "web_accessible_resources": [
-        "images/icon.png",
-        "js/jquery.js",
-        "js/jquery-ui.min.js.js"
-    ]
+    "web_accessible_resources": []
 }

@@ -1,6 +1,6 @@
 /**
  * @author: The Phuc
- * @package: inject share link to every youtube video
+ * @package: inject preview link to every youtube video
  * @since: 2017-03-23
  */
 if(typeof __clas === 'undefined')
@@ -18,11 +18,74 @@ if(typeof __text === 'undefined') {
         __text = 'Preview';
 }
 
-var injectPreview1 = function(__ele) {
-    var __livi = window.document.querySelectorAll(__ele),
+var dragWindow = function(id) {
+    let selected = null,
+    x_pos = 0, y_pos = 0,
+    x_elem = 0, y_elem = 0;
+    function _drag_init(elem) {
+        selected = elem;
+        x_elem = x_pos - selected.offsetLeft;
+        y_elem = y_pos - selected.offsetTop;
+    }
+    function _move_elem(e) {
+        x_pos = document.all ? window.event.clientX : e.pageX;
+        y_pos = document.all ? window.event.clientY : e.pageY;
+        if (selected !== null) {
+            selected.style.left = (x_pos - x_elem) + 'px';
+            selected.style.top = (y_pos - y_elem) + 'px';
+        }
+    }
+    function _destroy() {
+        selected = null;
+    }
+    document.getElementById(id).onmousedown = function () {
+        _drag_init(this);
+        return false;
+    };
+    document.onmousemove = _move_elem;
+    document.onmouseup = _destroy;
+};
+
+var openPreviewWindow = function(__idge, __title) {
+    let window_preview = window.document.createElement('div');
+        window_preview.id = __idpe;
+        window_preview.setAttribute('style', 'right:10px;bottom:10px;');
+    let window_video_content =
+        '<div class="titlebar">'+
+            '<div class="buttons">'+
+                '<div class="close">'+
+                    '<a class="closebutton" href="javascript:void(0)"><span><strong>x</strong></span></a>'+
+                '</div>'+
+                '<div class="minimize">'+
+                    '<a class="minimizebutton" href="javascript:void(0)"><span><strong>&ndash;</strong></span></a>'+
+                '</div>'+
+                '<div class="zoom">'+
+                    '<a class="zoombutton" href="javascript:void(0)"><span><strong>+</strong></span></a>'+
+                '</div>'+
+            '</div>'+
+            '<label class="title-preview">'+__title+'</label>'+
+        '</div>'+
+        '<div class="content">'+
+            '<iframe width="550" height="355" src="https://www.youtube.com/embed/'+__idge+'?autoplay=1" frameborder="0" allowfullscreen></iframe>'+
+        '</div>';
+    window_preview.innerHTML = window_video_content;
+    if(window.document.getElementById(__idpe))
+        window.document.getElementById(__idpe).remove();
+    window.document.body.appendChild(window_preview);
+    window.document.querySelector('div[class="close"]').addEventListener('click', function() {
+        window.document.getElementById(__idpe).remove();
+    });
+    dragWindow(__idpe);
+};
+
+var injectPreview = function(__ele) {
+    let __livi = window.document.querySelectorAll(__ele),
         __leli = __livi.length;
-    for( var i = 0; i < __leli; ++i ) {
-        var __fiid = __livi[i].querySelector('div.yt-lockup.yt-lockup-grid.yt-lockup-video.clearfix');
+    for( let i = 0; i < __leli; ++i ) {
+        let __h3 = __livi[i].querySelector('h3'),
+            __a  = __h3.querySelector('a'),
+            __ti = __a.title;
+        let __fiid = __livi[i].querySelector('div.yt-lockup.yt-lockup-grid.yt-lockup-video.clearfix');
         if(!__fiid)
             __fiid = __livi[i].querySelector('div.yt-lockup.yt-lockup-grid.yt-lockup-video.vve-check.clearfix');
         if(!__fiid)
@@ -36,7 +99,7 @@ var injectPreview1 = function(__ele) {
         if(!__fiid)
             __fiid = __livi[i].querySelector('div.yt-lockup.clearfix.yt-lockup-video.yt-lockup-tile');
         if(!__fiid) continue;
-        var __plin = __livi[i].querySelector('div.yt-thumb.video-thumb'),
+        let __plin = __livi[i].querySelector('div.yt-thumb.video-thumb'),
             __lipe = window.document.createElement('span'),
             __teli = window.document.createTextNode(__text);
         if(!__plin)
@@ -49,16 +112,7 @@ var injectPreview1 = function(__ele) {
             __lipe.onclick = function(e) {
                 e.preventDefault();
                 let __idge = this.getAttribute(__idna);
-                let __ifra =  window.document.createElement('iframe');
-                    __ifra.width = 500;
-                    __ifra.height = 315;
-                    __ifra.frameborder = 0;
-                    __ifra.allowfullscreen = true;
-                    __ifra.id = __idpe;
-                    __ifra.src = 'https://www.youtube.com/embed/' + __idge + '?autoplay=1';
-                if(window.document.getElementById(__idpe))
-                    window.document.getElementById(__idpe).remove();
-                window.document.body.appendChild(__ifra);
+                openPreviewWindow(__idge, __ti);
             };
             if(!__livi[i].querySelector('span[class="'+__clas+'"]'))
                 __plin.appendChild(__lipe);
@@ -66,22 +120,54 @@ var injectPreview1 = function(__ele) {
     }
 };
 
+var injectPreviewSearch = function(__ele) {
+    let __livi = window.document.querySelectorAll(__ele),
+        __leli = __livi.length;
+    for( let i = 0; i < __leli; ++i ) {
+        let __h3 = __livi[i].querySelector('h3'),
+            __a  = __h3.querySelector('a'),
+            __ti = __a.title;
+        let __plin = __livi[i].querySelector('span.yt-thumb-simple'),//div.yt-thumb.video-thumb
+            __lipe = window.document.createElement('span'),
+            __teli = window.document.createTextNode(__text);
+        if(!__plin)
+            __plin = __livi[i].querySelector('span.yt-thumb-simple');
+        if(__plin) {
+            let __idvi = __livi[i].getAttribute('data-context-item-id');
+            __lipe.appendChild(__teli);
+            __lipe.setAttribute(__idna, __idvi);
+            __lipe.setAttribute('title-video', __ti);
+            __lipe.className = __clas;
+            __lipe.onclick = function(e) {
+                e.preventDefault();
+                let __idge = this.getAttribute(__idna);
+                let __titl = this.getAttribute('title-video');
+                openPreviewWindow(__idge, __titl);
+            };
+            let img = __plin.querySelector('img');
+            if(!__livi[i].querySelector('span[class="'+__clas+'"]'))
+                __plin.insertBefore(__lipe, img);
+        }
+    }
+};
+
 window.document.onkeydown = function(evt) {
     evt = evt || window.event;
-    var isEscape = false;
+    let isEscape = false;
     if ("key" in evt) isEscape = (evt.key == "Escape" || evt.key == "Esc");
     else isEscape = (evt.keyCode === 27);
-    if (isEscape) window.document.getElementById(__idpe).remove();
+    isEscape && window.document.getElementById(__idpe) !== null && window.document.getElementById(__idpe).remove();
 };
 
 var __injectAll = function() {
-    injectPreview1('li.yt-shelf-grid-item');
-    injectPreview1('li.expanded-shelf-content-item-wrapper');
-    injectPreview1('li.yt-shelf-grid-item.yt-uix-shelfslider-item');
-    injectPreview1('li.channels-content-item.yt-shelf-grid-item.yt-uix-shelfslider-item');
-    injectPreview1('li.feed-item-container.yt-section-hover-container.legacy-style');
+    injectPreview('li.yt-shelf-grid-item');
+    injectPreview('li.expanded-shelf-content-item-wrapper');
+    injectPreview('li.yt-shelf-grid-item.yt-uix-shelfslider-item');
+    injectPreview('li.channels-content-item.yt-shelf-grid-item.yt-uix-shelfslider-item');
+    injectPreview('li.feed-item-container.yt-section-hover-container.legacy-style');
+    injectPreviewSearch('div.yt-lockup.yt-lockup-tile.yt-lockup-video.clearfix');
 };
-
+__injectAll();
 if(typeof __event == 'undefined')
     var __event = ['onload', 'scroll'];
 if(typeof __btn_next == 'undefined')

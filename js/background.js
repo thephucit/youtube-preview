@@ -1,6 +1,6 @@
 /**
  * @author: The Phuc
- * @package: inject share link to every youtube video
+ * @package: inject preview link to every youtube video
  * @since: 2017-03-23
  */
 
